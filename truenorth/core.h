@@ -84,6 +84,7 @@ typedef struct {
     int des_axon;
     int tick;
     int nopt; // neuron option (0: normal neuron, 1: spike generator)
+    int ntype; //neuron type (0: input neuron, 1: hidden layer neuron, 2: output neuron)
 } neuron_info;
 
 // TokenController to NeuronBlock
