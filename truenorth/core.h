@@ -17,6 +17,8 @@
 #define CHIP_LENGTH     64
 #define TICK_NUMBER     16
 #define GTICK_INTERVAL  10000
+#define PIXEL_NUMBER    4
+#define TIME_SLOT       2
 
 #define ROUTERQUEUE_SIZE    4
 

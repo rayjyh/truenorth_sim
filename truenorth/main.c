@@ -1,4 +1,4 @@
-#include <GL/glut.h>
+//#include <GL/glut.h>
 #include <pthread.h>
 #include "core.h"
 
@@ -25,7 +25,7 @@ int main (int argc, char* argv[]) {
     int gui_on = 0;
     pthread_t thread;
     char filename[FILE_NAME];
-    memcpy (filename, "data/random_data", 256);
+    memcpy (filename, "./test.txt", 256);
     
     // for check packet clear time
     int j, pckt_chk;
@@ -52,12 +52,12 @@ int main (int argc, char* argv[]) {
     printf ("complete!\n");
 
     // GUI init
-    if (gui_on == 1) {
+    /*if (gui_on == 1) {
         printf ("now initiate GUI...\n");
         gui_init (&argc, argv);
         pthread_create (&thread, NULL, &gui_thread, NULL);
         printf ("complete!\n");
-    }
+    }*/
 
     // simulate TrueNorth for 'SIMTIME' tick
     printf ("simulate TrueNorth Chip for %dms...\n", SIMTIME/GTICK_INTERVAL);
@@ -141,7 +141,7 @@ void simulation_report () {
 /********************************************************************************/
 /******************************** GUI functions *********************************/
 /********************************************************************************/
-
+/*
 // initiate graphic user interface
 void gui_init (int* argc, char* argv[]) {
     glutInit(argc, argv);
@@ -187,4 +187,4 @@ void display() {
     }
     glutSwapBuffers();
 }
-
+*/

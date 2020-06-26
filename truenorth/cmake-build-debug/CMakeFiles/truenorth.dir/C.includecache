@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/chip.c
+core.h
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/core.h
+
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/core.h
+stdio.h
+-
+string.h
+-
+stdlib.h
+-
+unistd.h
+-
+sys/types.h
+-
+sys/stat.h
+-
+fcntl.h
+-
+time.h
+-
+queue.h
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/queue.h
+
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/queue.h
+stdio.h
+-
+stdlib.h
+-
+

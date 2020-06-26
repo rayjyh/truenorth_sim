@@ -1,0 +1,3 @@
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/cmake-build-debug/CMakeFiles/truenorth.dir

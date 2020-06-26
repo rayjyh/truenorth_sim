@@ -6,6 +6,7 @@
 #define WEIGHT_RANGE    60
 #define LEAK_RANGE      4
 #define SPIKE_RATE      10
+#define NEURON_TYPE     3
 
 void make_neuron_info (sram* srm, char* ch);
 
@@ -86,6 +87,7 @@ void make_neuron_info (sram* srm, char* ch) {
         srm->ninfo[i].tick = (rand () % TICK_NUMBER);
         // get nopt info (type of neuron)
         srm->ninfo[i].nopt = (rand () % SPIKE_RATE);
+        srm->ninfo[i].ntype = (rand() % NEURON_TYPE);
     }
 
     return;

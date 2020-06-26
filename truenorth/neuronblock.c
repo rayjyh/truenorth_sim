@@ -64,8 +64,16 @@ int neuron_compute (core* mycore, int coreno) {
     cinfo = (compute_info*) dequeue (crq);
     // when input spike location and synapse is equal, compute
     if (cinfo->iscompute == 1) {
-        for (i = 0; i < NEURONS; i++) {
-            cinfo->ninfo.potential += cinfo->ninfo.weight[i] * cinfo->ninfo.synapse[i] * cinfo->spike.spike[i];
+        if (cinfo->ninfo.ntype == 0){
+            for (i = 0; i < AXON_NUMBER; i++) {
+                cinfo->ninfo.potential += cinfo->ninfo.weight[i] * cinfo->ninfo.synapse[i] * cinfo->spike.spike[i];
+            }
+        }else if (cinfo->ninfo.ntype == 1){
+            for (i = 0; i < AXON_NUMBER; i++) {
+                cinfo->ninfo.potential += cinfo->ninfo.weight[i] * cinfo->ninfo.synapse[i] * cinfo->spike.spike[i];
+            }
+        }else{
+
         }
     }
     // if potential is over the threshold voltage, or the neuron is a spike generator,
