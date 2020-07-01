@@ -1,7 +1,7 @@
 #include "core.h"
 
 #define TKNQUEUE_SIZE       256
-#define TKNCOMPUTE_DELAY    2   
+#define TKNCOMPUTE_DELAY    1//2
 
 static int tkn_checker = 0;
 
@@ -45,10 +45,10 @@ int send_request_to_neuron (core* mycore, compute_info* cinfo) {
 // what a state mean,
 // state/2 = target neuron, 
 // state%2 = 0: need to send request to scheduler & sram, 1: waiting axon, neuron value from scheduler & sram
-int token_request_block (core* mycore, int gclk) {
+int token_request_block (core* mycore, int gclk, int* in_spikes) {
 
     token* tkn = &(mycore->tkn);
-    int tick = (gclk / GTICK_INTERVAL) % TICK_NUMBER;
+    int tick = (gclk / GTICK_INTERVAL) % TICK_NUMBER;// why don't use gclk
     int* state = &(tkn->state);
     int neuron_num = (*state)/2;
     compute_info* cinfo = NULL;
@@ -57,26 +57,30 @@ int token_request_block (core* mycore, int gclk) {
     if (gclk % GTICK_INTERVAL == 0)
         *state = 0;
     // processing end, need new global synchronous clk tick
-    if (*state == 2 * NEURONS)
-        return 0;
+    //if (*state == 2 * NEURONS)
+    //    return 0;
     if (!tkn_checker) {
         tkn->token_activate++;
         tkn_checker = 1;
     }
     // if block need to send a request to sch & sram,
     if ((*state) % 2 == 0) {
-        send_request_to_scheduler (mycore, tick);
+        send_request_to_scheduler (mycore, tick);// why don't use gclk
         send_request_to_sram (mycore, neuron_num);
         (*state) += 1;
     }
     // else block need to receive axon, neuron_info and send it to TokenComputeBlock,
     else {
-        if (tkn->input == NULL || tkn->ninfo == NULL)
+        if ((in_spikes == NULL && tkn->input == NULL) || tkn->ninfo == NULL)
             return 0;
         cinfo = (compute_info*) malloc (sizeof(compute_info));
         cinfo->neuron_no = neuron_num;
         memcpy ((void*)&(cinfo->ninfo), (void*)tkn->ninfo, sizeof(neuron_info));
-        memcpy ((void*)&(cinfo->spike), (void*)tkn->input, sizeof(axon));
+        if (cinfo->ninfo.ntype == 0) {
+            memcpy ((void*)&(cinfo->spike), (void*)in_spikes, sizeof(PIXEL_NUMBER*4));
+        } else {
+            memcpy ((void*)&(cinfo->spike), (void*)tkn->input, sizeof(axon));
+        }
         free ((void*)tkn->ninfo);
         free ((void*)tkn->input);
         tkn->ninfo = NULL;
@@ -130,10 +134,10 @@ int token_compute_block (core* mycore) {
     return send_request_to_neuron (mycore, cinfo);
 }
 
-void token_advance (core* mycore, int gclk) {
+void token_advance (core* mycore, int gclk, int* in_spikes) {
 
     tkn_checker = 0;
-    token_request_block (mycore, gclk);
+    token_request_block (mycore, gclk, in_spikes);
     token_compute_block (mycore);
 
     return;

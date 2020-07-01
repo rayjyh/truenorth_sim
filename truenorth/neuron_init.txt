@@ -1,0 +1,7 @@
+neuron_id,synapse[],weight[],leak,num_dest,dest[],dest_axon[],tick,nopt,ntype
+1
+2
+3
+4
+5
+6

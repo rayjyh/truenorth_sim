@@ -6,10 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/chip.c
-core.h
-/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/core.h
-
 /Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/core.h
 stdio.h
 -
@@ -29,6 +25,10 @@ time.h
 -
 queue.h
 /Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/queue.h
+
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/coresram.c
+core.h
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/core.h
 
 /Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/queue.h
 stdio.h

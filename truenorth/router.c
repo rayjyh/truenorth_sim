@@ -1,8 +1,8 @@
 #include "core.h"
 
 // #define ROUTERQUEUE_SIZE    4 *defined in "core.h"
-#define PACKETSEND_DELAY    5
-#define SPIKESEND_DELAY     2
+#define PACKETSEND_DELAY    1//5
+#define SPIKESEND_DELAY     1//2
 
 int router_drops = 0;  // abandoned packets
 

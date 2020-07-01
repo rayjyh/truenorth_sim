@@ -12,13 +12,14 @@
 
 #include "queue.h"
 
-#define NEURONS         256
-#define AXON_NUMBER     256
-#define CHIP_LENGTH     64
+#define NEURONS         3//256
+#define AXON_NUMBER     3//256
+#define CHIP_LENGTH     2//64
 #define TICK_NUMBER     16
 #define GTICK_INTERVAL  10000
-#define PIXEL_NUMBER    4
-#define TIME_SLOT       2
+#define PIXEL_NUMBER    3
+#define MAX_DEST        3   //maximum number of destination neurons allowed
+//#define TIME_SLOT       2
 
 #define ROUTERQUEUE_SIZE    4
 
@@ -82,8 +83,9 @@ typedef struct {
     int weight[AXON_NUMBER];
     int leak;
     int potential;
-    int dest;
-    int des_axon;
+    int dest[MAX_DEST];
+    int des_axon[MAX_DEST];
+    int num_dest; //number of destinations
     int tick;
     int nopt; // neuron option (0: normal neuron, 1: spike generator)
     int ntype; //neuron type (0: input neuron, 1: hidden layer neuron, 2: output neuron)
@@ -182,10 +184,10 @@ void scheduler_advance (core* mycore);
 
 /* TokenController functions */
 void token_init (token* mytoken);
-void token_advance (core* mycore, int gclk);
+void token_advance (core* mycore, int gclk, int* in_spikes);
 
 /* SRAM functions */
-void sram_init (sram* srm, char* ch);
+void sram_init (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][NEURONS][MAX_DEST], int dest_axon[][NEURONS][MAX_DEST], int coreno, int ntype[][NEURONS]);
 void sram_advance (core* mycore);
 
 /* NeuronBlock functions */
@@ -194,7 +196,7 @@ void neuron_advance (core* mycore, int coreno);
 
 /* Chip controll functions */
 void chip_init (chip* mychip, char* ch);
-void chip_advance (chip* mychip, int gclk);
+void chip_advance (chip* mychip, int gclk, int* in_spikes);
 
 
 #endif

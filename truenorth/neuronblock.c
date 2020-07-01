@@ -1,10 +1,10 @@
 #include "core.h"
 
 #define NRNQUEUE_SIZE       256
-#define NRNCALCULATE_DELAY  30
-#define NRNCOMPUTE_DELAY    3
-#define NRNPSEND_DELAY      1
-#define NRNNINFO_DELAY      2
+#define NRNCALCULATE_DELAY  1//30
+#define NRNCOMPUTE_DELAY    1//3
+#define NRNPSEND_DELAY      1//1
+#define NRNNINFO_DELAY      1//2
 
 #define THRESHOLD_VOLT      30
 #define BOTTOM_VOLT         0
@@ -64,28 +64,28 @@ int neuron_compute (core* mycore, int coreno) {
     cinfo = (compute_info*) dequeue (crq);
     // when input spike location and synapse is equal, compute
     if (cinfo->iscompute == 1) {
-        if (cinfo->ninfo.ntype == 0){
+        /*if (cinfo->ninfo.ntype == 0){
+            for (i = 0; i < PIXEL_NUMBER; i++) {
+                cinfo->ninfo.potential += cinfo->ninfo.synapse[i] * in_spikes[i];
+            }
+        }else {//if (cinfo->ninfo.ntype == 1){*/
             for (i = 0; i < AXON_NUMBER; i++) {
                 cinfo->ninfo.potential += cinfo->ninfo.weight[i] * cinfo->ninfo.synapse[i] * cinfo->spike.spike[i];
             }
-        }else if (cinfo->ninfo.ntype == 1){
-            for (i = 0; i < AXON_NUMBER; i++) {
-                cinfo->ninfo.potential += cinfo->ninfo.weight[i] * cinfo->ninfo.synapse[i] * cinfo->spike.spike[i];
-            }
-        }else{
-
-        }
+        //}
     }
     // if potential is over the threshold voltage, or the neuron is a spike generator,
     // send a packet to router
     if (cinfo->ninfo.potential >= THRESHOLD_VOLT || cinfo->ninfo.nopt == 1) {
         
         cinfo->ninfo.potential = BOTTOM_VOLT;
-        pkt = (packet*) malloc (sizeof(packet));
-        dxdy_compute (coreno, cinfo->ninfo.dest, &(pkt->dx), &(pkt->dy));
-        pkt->spk.axonno = cinfo->ninfo.des_axon;
-        pkt->spk.tick = cinfo->ninfo.tick;
-        enqueue (prq, (void*)pkt);
+        for (int j = 0; j < cinfo->ninfo.num_dest; ++j) {
+            pkt = (packet*) malloc (sizeof(packet));
+            dxdy_compute (coreno, cinfo->ninfo.dest[j], &(pkt->dx), &(pkt->dy));
+            pkt->spk.axonno = cinfo->ninfo.des_axon[j];
+            pkt->spk.tick = cinfo->ninfo.tick;
+            enqueue (prq, (void*)pkt);
+        }
     }
     // if potential is lower than bottom voltage,
     cinfo->ninfo.potential -= cinfo->ninfo.leak;

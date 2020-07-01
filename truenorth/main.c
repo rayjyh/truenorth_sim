@@ -59,10 +59,30 @@ int main (int argc, char* argv[]) {
         printf ("complete!\n");
     }*/
 
+    //read input spikes
+    int in_spikes[SIMTIME][PIXEL_NUMBER];
+
+    FILE* fp = fopen("/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/test.txt", "r");
+    if(fp == NULL)
+    {
+        printf("Cannot open the file.");
+        exit(0);
+    }
+    for(int i = 0; i < SIMTIME; i++)
+    {
+        for(int j = 0; j < PIXEL_NUMBER; j++)
+        {
+            fscanf(fp,"%d",&in_spikes[i][j]);
+        }
+    }
+
+    fclose(fp);
+
     // simulate TrueNorth for 'SIMTIME' tick
     printf ("simulate TrueNorth Chip for %dms...\n", SIMTIME/GTICK_INTERVAL);
     for (i = 0; i < SIMTIME; i++) {
-        chip_advance (&mychip, i);
+        int* input = &in_spikes[i][0];
+        chip_advance (&mychip, i, input);
         if (i%GTICK_INTERVAL == 0) {
             printf ("global clock: %d\n", i/GTICK_INTERVAL);
             clear_time = 0;
