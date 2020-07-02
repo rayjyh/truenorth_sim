@@ -81,7 +81,9 @@ int main (int argc, char* argv[]) {
     // simulate TrueNorth for 'SIMTIME' tick
     printf ("simulate TrueNorth Chip for %dms...\n", SIMTIME/GTICK_INTERVAL);
     for (i = 0; i < SIMTIME; i++) {
-        int* input = &in_spikes[i][0];
+        int idx = i/GTICK_INTERVAL;
+        int* input = &in_spikes[idx][0];
+        printf ("global clock: %d\n", i);
         chip_advance (&mychip, i, input);
         if (i%GTICK_INTERVAL == 0) {
             printf ("global clock: %d\n", i/GTICK_INTERVAL);

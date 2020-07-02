@@ -30,7 +30,7 @@ void dxdy_compute (int coreno, int des, int* dx, int* dy) {
     return;
 }
 
-int neuron_compute (core* mycore, int coreno) {
+int neuron_compute (core* mycore, int coreno, int gclk, output* output) {
 
     neuron* nrn = &(mycore->nrn);
     int* timer = &(nrn->timer.in_timer);
@@ -79,12 +79,17 @@ int neuron_compute (core* mycore, int coreno) {
     if (cinfo->ninfo.potential >= THRESHOLD_VOLT || cinfo->ninfo.nopt == 1) {
         
         cinfo->ninfo.potential = BOTTOM_VOLT;
-        for (int j = 0; j < cinfo->ninfo.num_dest; ++j) {
+        for (int j = 0; j < cinfo->ninfo.num_dest; ++j) { //add multicasting
             pkt = (packet*) malloc (sizeof(packet));
             dxdy_compute (coreno, cinfo->ninfo.dest[j], &(pkt->dx), &(pkt->dy));
             pkt->spk.axonno = cinfo->ninfo.des_axon[j];
             pkt->spk.tick = cinfo->ninfo.tick;
+            pkt->spk.input_idx = cinfo->input_idx;
             enqueue (prq, (void*)pkt);
+        }
+        //collect output if this is a output neuron
+        if (cinfo->ninfo.ntype == 2){
+            output->output[cinfo->input_idx][cinfo->ninfo.neuron_id] = 1;
         }
     }
     // if potential is lower than bottom voltage,
@@ -155,9 +160,9 @@ int send_ninfo_to_sram (core* mycore) {
     return 0;
 }
 
-void neuron_advance (core* mycore, int coreno) {
+void neuron_advance (core* mycore, int coreno, int gclk, output* output) {
     
-    neuron_compute (mycore, coreno);
+    neuron_compute (mycore, coreno, gclk, output);
     send_packet_nrn_to_rtr (mycore);
     send_ninfo_to_sram (mycore);
     

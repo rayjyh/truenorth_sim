@@ -16,8 +16,10 @@
 #define AXON_NUMBER     3//256
 #define CHIP_LENGTH     2//64
 #define TICK_NUMBER     16
-#define GTICK_INTERVAL  10000
+#define GTICK_INTERVAL  100//10000
 #define PIXEL_NUMBER    3
+#define INPUT_NUMBER    30
+#define OUTPUT_NEURONS  2
 #define MAX_DEST        3   //maximum number of destination neurons allowed
 //#define TIME_SLOT       2
 
@@ -63,6 +65,7 @@ typedef struct {
 typedef struct {
     int axonno;
     int tick;
+    int input_idx; //associated input index, to match input with output
 } spike_info;
 
 // router to router, NeuronBlock to Router
@@ -89,6 +92,7 @@ typedef struct {
     int tick;
     int nopt; // neuron option (0: normal neuron, 1: spike generator)
     int ntype; //neuron type (0: input neuron, 1: hidden layer neuron, 2: output neuron)
+    int neuron_id; // neuron id of all the neuron in the same layer
 } neuron_info;
 
 // TokenController to NeuronBlock
@@ -97,6 +101,7 @@ typedef struct {
     int iscompute;
     neuron_info ninfo;
     axon spike;
+    int input_idx; //associated input index, to match input with output
 } compute_info;
 
 // request from TokenController to Scheduler
@@ -109,6 +114,12 @@ typedef struct {
     int neuron_num;
 } s_request;
 
+//
+
+//output
+typedef struct {
+    int output[INPUT_NUMBER][OUTPUT_NEURONS];
+}output;
 
 /********************************************************************************/
 /********************************* data elements ********************************/
@@ -127,6 +138,7 @@ typedef struct {
 typedef struct {
     scheduler_t timer;
     axon axons[TICK_NUMBER];   // local SRAM to save spike data
+    int input_idx[TICK_NUMBER]; // associated input index, to match input with output
     queue rq;    // save request from router
     queue tq;    // save request from TokenController
     int sch_activate;
@@ -136,6 +148,7 @@ typedef struct {
     token_t timer;
     axon* input;
     neuron_info* ninfo;
+    int input_idx; // associated input index, to match input with output
     int state;  // state for token request block
     queue rq;   // save comparing request from token request block
     int token_activate;
@@ -165,6 +178,7 @@ typedef struct {
 } core;
 
 typedef struct {
+    output output;
     core cores[CHIP_LENGTH * CHIP_LENGTH];
 } chip;
 
@@ -192,7 +206,7 @@ void sram_advance (core* mycore);
 
 /* NeuronBlock functions */
 void neuron_init (core* mycore);
-void neuron_advance (core* mycore, int coreno);
+void neuron_advance (core* mycore, int coreno, int gclk, output* output);
 
 /* Chip controll functions */
 void chip_init (chip* mychip, char* ch);

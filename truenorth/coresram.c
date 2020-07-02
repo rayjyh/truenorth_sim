@@ -93,6 +93,7 @@ void make_neuron_info (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][
         srm->ninfo[i].nopt = 0;//(rand () % SPIKE_RATE);
         // define neuron type (input, hidden, output)
         srm->ninfo[i].ntype = ntype[coreno][i];//(rand() % NEURON_TYPE);
+        srm->ninfo[i].neuron_id = i;
     }
 
     return;

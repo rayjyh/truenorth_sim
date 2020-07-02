@@ -57,8 +57,8 @@ int token_request_block (core* mycore, int gclk, int* in_spikes) {
     if (gclk % GTICK_INTERVAL == 0)
         *state = 0;
     // processing end, need new global synchronous clk tick
-    //if (*state == 2 * NEURONS)
-    //    return 0;
+    if (*state == 2 * NEURONS)
+        return 0;
     if (!tkn_checker) {
         tkn->token_activate++;
         tkn_checker = 1;
@@ -75,11 +75,14 @@ int token_request_block (core* mycore, int gclk, int* in_spikes) {
             return 0;
         cinfo = (compute_info*) malloc (sizeof(compute_info));
         cinfo->neuron_no = neuron_num;
+        //cinfo->input_idx = 0;
         memcpy ((void*)&(cinfo->ninfo), (void*)tkn->ninfo, sizeof(neuron_info));
         if (cinfo->ninfo.ntype == 0) {
             memcpy ((void*)&(cinfo->spike), (void*)in_spikes, sizeof(PIXEL_NUMBER*4));
+            cinfo->input_idx = gclk;
         } else {
             memcpy ((void*)&(cinfo->spike), (void*)tkn->input, sizeof(axon));
+            cinfo->input_idx = tkn->input_idx;
         }
         free ((void*)tkn->ninfo);
         free ((void*)tkn->input);

@@ -37,7 +37,8 @@ int enqueue (queue* myqueue, void* element) {
 void* dequeue (queue* myqueue) {
 
     void* element;
-    void* oldhead;
+    //void* oldhead;
+    void* oldhead = (void*) malloc (sizeof(myqueue->head));
 
     if (myqueue->size == 0)
         return NULL;

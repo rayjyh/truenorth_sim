@@ -21,6 +21,10 @@ void read_input_spikes(int** input, char* ch) {
 }
 */
 
+void output_init(output* output) {
+    memset ((void*)output->output, 0, sizeof(int) * INPUT_NUMBER * OUTPUT_NEURONS);
+}
+
 void chip_init (chip* mychip, char* ch) {
     
     core* mycore;
@@ -65,6 +69,8 @@ void chip_init (chip* mychip, char* ch) {
                                                    {1,1,0},
                                                    {1,1,1},
                                                    {1,1,1}};
+    output_init(&(mychip->output));
+
     for (i = 0; i < CHIP_LENGTH*CHIP_LENGTH; i++) {
 
         mycore = &(mychip->cores[i]);
@@ -92,7 +98,7 @@ void chip_advance (chip* mychip, int gclk, int* in_spikes) {
         scheduler_advance (mycore);
         token_advance (mycore, gclk, in_spikes);
         sram_advance (mycore);
-        neuron_advance (mycore, i);
+        neuron_advance (mycore, i, gclk, &(mychip->output));
     }
 
     return;

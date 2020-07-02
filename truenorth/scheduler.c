@@ -9,6 +9,7 @@ void scheduler_init (scheduler* sch) {
    
     memset ((void*)&(sch->timer), 0, sizeof(scheduler_t));
     memset ((void*)sch->axons, 0, sizeof(axon) * AXON_NUMBER);
+    memset ((void*)sch->input_idx, 0, sizeof(int) * TICK_NUMBER);
     queue_init (&(sch->rq), SCHQUEUE_SIZE);
     queue_init (&(sch->tq), SCHQUEUE_SIZE);
     
@@ -32,6 +33,7 @@ int save_spike_info (scheduler* sch) {
     // save spike_info into local sram(axons)
     ptr = (spike_info*) dequeue (&(sch->rq));
     sch->axons[ptr->tick].spike[ptr->axonno] = 1;
+    sch->input_idx[ptr->tick] = ptr->input_idx;
     free (ptr);
     return 0;
 }
@@ -74,6 +76,7 @@ int send_axon_to_token (core* mycore) {
         return -1;
     }
     mycore->tkn.input = ptr;
+    mycore->tkn.input_idx = sch->input_idx[rqst->tick];
     //(mycore->tkn.state) += 1;
     return 0;
 }
