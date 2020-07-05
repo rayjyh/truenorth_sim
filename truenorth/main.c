@@ -60,7 +60,7 @@ int main (int argc, char* argv[]) {
     }*/
 
     //read input spikes
-    int in_spikes[SIMTIME][PIXEL_NUMBER];
+    int in_spikes[SIMTIME/GTICK_INTERVAL][PIXEL_NUMBER];
 
     FILE* fp = fopen("/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/test.txt", "r");
     if(fp == NULL)
@@ -68,7 +68,7 @@ int main (int argc, char* argv[]) {
         printf("Cannot open the file.");
         exit(0);
     }
-    for(int i = 0; i < SIMTIME; i++)
+    for(int i = 0; i < SIMTIME/GTICK_INTERVAL; i++)
     {
         for(int j = 0; j < PIXEL_NUMBER; j++)
         {

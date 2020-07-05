@@ -16,7 +16,7 @@
 #define AXON_NUMBER     3//256
 #define CHIP_LENGTH     2//64
 #define TICK_NUMBER     16
-#define GTICK_INTERVAL  100//10000
+#define GTICK_INTERVAL  50//10000
 #define PIXEL_NUMBER    3
 #define INPUT_NUMBER    30
 #define OUTPUT_NEURONS  2

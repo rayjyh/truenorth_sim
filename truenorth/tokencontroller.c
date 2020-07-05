@@ -80,7 +80,7 @@ int token_request_block (core* mycore, int gclk, int* in_spikes, int coreno) {
         memcpy ((void*)&(cinfo->ninfo), (void*)tkn->ninfo, sizeof(neuron_info));
         if (cinfo->ninfo.ntype == 0) {
             memcpy ((void*)&(cinfo->spike), (void*)in_spikes, PIXEL_NUMBER*sizeof(int));
-            cinfo->input_idx = gclk;
+            cinfo->input_idx = gclk/GTICK_INTERVAL;
         } else {
             memcpy ((void*)&(cinfo->spike), (void*)tkn->input, sizeof(axon));
             cinfo->input_idx = tkn->input_idx;
