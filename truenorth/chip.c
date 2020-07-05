@@ -21,9 +21,11 @@ void read_input_spikes(int** input, char* ch) {
 }
 */
 
+/*
 void output_init(output* output) {
     memset ((void*)output->output, 0, sizeof(int) * INPUT_NUMBER * OUTPUT_NEURONS);
 }
+*/
 
 void chip_init (chip* mychip, char* ch) {
     
@@ -67,19 +69,27 @@ void chip_init (chip* mychip, char* ch) {
                                                       {0,0,0}};
     int ntype[CHIP_LENGTH*CHIP_LENGTH][NEURONS] = {{0,0,0},
                                                    {1,1,0},
-                                                   {1,1,1},
-                                                   {1,1,1}};
-    output_init(&(mychip->output));
+                                                   {2,2,0},
+                                                   {0,0,0}};
+    //output_init(&(mychip->output));
+    int* i_ntype;
+    //int* i_dest;
+    //int* i_dest_axon;
+    int* i_num_dest;
 
     for (i = 0; i < CHIP_LENGTH*CHIP_LENGTH; i++) {
-
+        //i_dest = &dest[i][0][0];
+        //i_dest_axon = &dest_axon[i][0][0];
+        i_num_dest = &num_dest[i][0];
+        i_ntype = &ntype[i][0];
         mycore = &(mychip->cores[i]);
 
         router_init (&(mycore->rtr));
         scheduler_init (&(mycore->sch));
         token_init (&(mycore->tkn));
-        sram_init (&(mycore->srm), ch, num_dest, dest, dest_axon, i, ntype);
+        sram_init (&(mycore->srm), ch, i_num_dest, dest, dest_axon, i, i_ntype);
         neuron_init (mycore);
+        //output_init(&(mycore->output));
     }
 
     return;
@@ -96,9 +106,9 @@ void chip_advance (chip* mychip, int gclk, int* in_spikes) {
 
         router_advance (mychip, i, gclk);
         scheduler_advance (mycore);
-        token_advance (mycore, gclk, in_spikes);
-        sram_advance (mycore);
-        neuron_advance (mycore, i, gclk, &(mychip->output));
+        token_advance (mycore, gclk, in_spikes, i);
+        sram_advance (mycore, i);
+        neuron_advance (mycore, i, gclk);
     }
 
     return;

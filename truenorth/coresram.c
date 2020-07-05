@@ -8,9 +8,9 @@
 #define SPIKE_RATE      10
 #define NEURON_TYPE     3
 
-void make_neuron_info (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][NEURONS][MAX_DEST], int dest_axon[][NEURONS][MAX_DEST], int coreno, int ntype[][NEURONS]);
+void make_neuron_info (sram* srm, char* ch, int* num_dest, int (*dest)[NEURONS][MAX_DEST], int (*dest_axon)[NEURONS][MAX_DEST], int coreno, int* ntype);
 
-void sram_init (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][NEURONS][MAX_DEST], int dest_axon[][NEURONS][MAX_DEST], int coreno, int ntype[][NEURONS]) {
+void sram_init (sram* srm, char* ch, int* num_dest, int (*dest)[NEURONS][MAX_DEST], int (*dest_axon)[NEURONS][MAX_DEST], int coreno, int* ntype) {
 
     memset ((void*)&(srm->timer), 0, sizeof(sram_t));
     memset ((void*)&(srm->ninfo), 0, sizeof(neuron_info) * NEURONS);
@@ -22,7 +22,7 @@ void sram_init (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][NEURONS
     return;
 }
 
-int send_ninfo_to_token (core* mycore) {
+int send_ninfo_to_token (core* mycore, int coreno) {
 
     token* tkn = &(mycore->tkn);
     sram* srm = &(mycore->srm);
@@ -60,11 +60,11 @@ int send_ninfo_to_token (core* mycore) {
 }
 
 
-void sram_advance (core* mycore) {
-    send_ninfo_to_token (mycore);
+void sram_advance (core* mycore, int coreno) {
+    send_ninfo_to_token (mycore, coreno);
 }
 
-void make_neuron_info (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][NEURONS][MAX_DEST], int dest_axon[][NEURONS][MAX_DEST], int coreno, int ntype[][NEURONS]) {
+void make_neuron_info (sram* srm, char* ch, int* num_dest, int (*dest)[NEURONS][MAX_DEST], int (*dest_axon)[NEURONS][MAX_DEST], int coreno, int* ntype) {
     
     int i, j;
     
@@ -80,11 +80,11 @@ void make_neuron_info (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][
             srm->ninfo[i].weight[j] = (rand () % WEIGHT_RANGE);
         }
         // get leak info
-        srm->ninfo[i].leak = (rand () % LEAK_RANGE);
+        srm->ninfo[i].leak = 2;//(rand () % LEAK_RANGE);
         // get destination info (i,e, dest, des_axon, tick)
-        srm->ninfo[i].num_dest = num_dest[coreno][i];
-        int num_dest = srm->ninfo[i].num_dest;
-        for (int k = 0; k < num_dest; ++k) {
+        srm->ninfo[i].num_dest = num_dest[i];
+        int num_dest_temp = srm->ninfo[i].num_dest;
+        for (int k = 0; k < num_dest_temp; ++k) {
             srm->ninfo[i].dest[k] = dest[coreno][i][k];//(rand () % (CHIP_LENGTH*CHIP_LENGTH));
             srm->ninfo[i].des_axon[k] = dest_axon[coreno][i][k];//(rand () % AXON_NUMBER);
         }
@@ -92,7 +92,7 @@ void make_neuron_info (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][
         // get nopt info (type of neuron)
         srm->ninfo[i].nopt = 0;//(rand () % SPIKE_RATE);
         // define neuron type (input, hidden, output)
-        srm->ninfo[i].ntype = ntype[coreno][i];//(rand() % NEURON_TYPE);
+        srm->ninfo[i].ntype = ntype[i];//(rand() % NEURON_TYPE);
         srm->ninfo[i].neuron_id = i;
     }
 

@@ -6,7 +6,7 @@
 #define NRNPSEND_DELAY      1//1
 #define NRNNINFO_DELAY      1//2
 
-#define THRESHOLD_VOLT      30
+#define THRESHOLD_VOLT      5
 #define BOTTOM_VOLT         0
 
 int gens = 0;   // generated packets
@@ -19,6 +19,8 @@ void neuron_init (core* mycore) {
     queue_init (&(nrn->crq), NRNQUEUE_SIZE);
     queue_init (&(nrn->prq), NRNQUEUE_SIZE);
     queue_init (&(nrn->nrq), NRNQUEUE_SIZE);
+    queue_init (&(nrn->trq), 0);
+    queue_init (&(nrn->oq), 0);
     nrn->neuron_activate = 0;
 
     return;
@@ -30,7 +32,7 @@ void dxdy_compute (int coreno, int des, int* dx, int* dy) {
     return;
 }
 
-int neuron_compute (core* mycore, int coreno, int gclk, output* output) {
+int neuron_compute (core* mycore, int coreno, int gclk) {
 
     neuron* nrn = &(mycore->nrn);
     int* timer = &(nrn->timer.in_timer);
@@ -38,8 +40,12 @@ int neuron_compute (core* mycore, int coreno, int gclk, output* output) {
     queue* crq = &(nrn->crq);
     queue* prq = &(nrn->prq);
     queue* nrq = &(nrn->nrq);
+    queue* trq = &(nrn->trq);
+    queue* oq  = &(nrn->oq);
     int i;
     packet* pkt = NULL;
+    trace* trace_ptr = NULL;
+    output* output_ptr = NULL;
 
     // if queue is empty, return
     if (isempty (crq)) {
@@ -77,7 +83,7 @@ int neuron_compute (core* mycore, int coreno, int gclk, output* output) {
     // if potential is over the threshold voltage, or the neuron is a spike generator,
     // send a packet to router
     if (cinfo->ninfo.potential >= THRESHOLD_VOLT || cinfo->ninfo.nopt == 1) {
-        
+
         cinfo->ninfo.potential = BOTTOM_VOLT;
         for (int j = 0; j < cinfo->ninfo.num_dest; ++j) { //add multicasting
             pkt = (packet*) malloc (sizeof(packet));
@@ -86,10 +92,17 @@ int neuron_compute (core* mycore, int coreno, int gclk, output* output) {
             pkt->spk.tick = cinfo->ninfo.tick;
             pkt->spk.input_idx = cinfo->input_idx;
             enqueue (prq, (void*)pkt);
+            trace_ptr = (trace*) malloc (sizeof(trace));
+            trace_ptr->gclk = gclk;
+            trace_ptr->dest = cinfo->ninfo.dest[j];
+            append(trq, (void*)trace_ptr);
         }
         //collect output if this is a output neuron
         if (cinfo->ninfo.ntype == 2){
-            output->output[cinfo->input_idx][cinfo->ninfo.neuron_id] = 1;
+            output_ptr = (output*) malloc (sizeof(output));
+            output_ptr->input_idx = cinfo->input_idx;
+            output_ptr->neuron_id = cinfo->ninfo.neuron_id;
+            append(oq, (void*)output_ptr);
         }
     }
     // if potential is lower than bottom voltage,
@@ -160,9 +173,9 @@ int send_ninfo_to_sram (core* mycore) {
     return 0;
 }
 
-void neuron_advance (core* mycore, int coreno, int gclk, output* output) {
+void neuron_advance (core* mycore, int coreno, int gclk) {
     
-    neuron_compute (mycore, coreno, gclk, output);
+    neuron_compute (mycore, coreno, gclk);
     send_packet_nrn_to_rtr (mycore);
     send_ninfo_to_sram (mycore);
     

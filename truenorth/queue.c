@@ -34,6 +34,25 @@ int enqueue (queue* myqueue, void* element) {
     return 0;
 }
 
+// enqueue with infinite depth
+int append(queue* myqueue, void* element) {
+
+    //if (myqueue->size == myqueue->max_size)
+    //    return -1;
+    myqueue->size++;
+    node* ptr = (node*)malloc(sizeof(node));
+    ptr->element = element;
+    if (myqueue->head == NULL && myqueue->tail == NULL) {
+        myqueue->head = ptr;
+        myqueue->tail = ptr;
+    }
+    else {
+        myqueue->tail->next = ptr;
+        myqueue->tail = ptr;
+    }
+    return 0;
+}
+
 void* dequeue (queue* myqueue) {
 
     void* element;

@@ -60,6 +60,11 @@ typedef struct {
 /********************************************************************************/
 /******************************* message elements *******************************/
 /********************************************************************************/
+// for NoC analysis and optimization
+typedef struct {
+    int gclk;
+    int dest;
+} trace;
 
 // router to scheduler
 typedef struct {
@@ -114,11 +119,10 @@ typedef struct {
     int neuron_num;
 } s_request;
 
-//
-
 //output
 typedef struct {
-    int output[INPUT_NUMBER][OUTPUT_NEURONS];
+    int input_idx;
+    int neuron_id;
 }output;
 
 /********************************************************************************/
@@ -159,6 +163,8 @@ typedef struct {
     queue crq;   // save computation request from TokenController
     queue prq;   // save packet sending request from Compute module in NeuronBlock
     queue nrq;   // save neuron_info sending request from Compute module in NeuronBlock
+    queue trq;   // save generated pkt for NoC trace analysis
+    queue oq;    // save output
     int neuron_activate;
 } neuron;
 
@@ -178,7 +184,6 @@ typedef struct {
 } core;
 
 typedef struct {
-    output output;
     core cores[CHIP_LENGTH * CHIP_LENGTH];
 } chip;
 
@@ -198,15 +203,15 @@ void scheduler_advance (core* mycore);
 
 /* TokenController functions */
 void token_init (token* mytoken);
-void token_advance (core* mycore, int gclk, int* in_spikes);
+void token_advance (core* mycore, int gclk, int* in_spikes, int coreno);
 
 /* SRAM functions */
-void sram_init (sram* srm, char* ch, int num_dest[][NEURONS], int dest[][NEURONS][MAX_DEST], int dest_axon[][NEURONS][MAX_DEST], int coreno, int ntype[][NEURONS]);
-void sram_advance (core* mycore);
+void sram_init (sram* srm, char* ch, int* num_dest, int (*dest)[NEURONS][MAX_DEST], int (*dest_axon)[NEURONS][MAX_DEST], int coreno, int* ntype);
+void sram_advance (core* mycore, int coreno);
 
 /* NeuronBlock functions */
 void neuron_init (core* mycore);
-void neuron_advance (core* mycore, int coreno, int gclk, output* output);
+void neuron_advance (core* mycore, int coreno, int gclk);
 
 /* Chip controll functions */
 void chip_init (chip* mychip, char* ch);

@@ -10,7 +10,7 @@ void token_init (token* mytoken) {
     memset ((void*)&(mytoken->timer), 0, sizeof(token_t));
     mytoken->input = NULL;
     mytoken->ninfo = NULL;
-    mytoken->state = 2*NEURONS;
+    mytoken->state = 0;//2*(NEURONS-1);
     queue_init (&(mytoken->rq), TKNQUEUE_SIZE);
     
     return;
@@ -45,7 +45,7 @@ int send_request_to_neuron (core* mycore, compute_info* cinfo) {
 // what a state mean,
 // state/2 = target neuron, 
 // state%2 = 0: need to send request to scheduler & sram, 1: waiting axon, neuron value from scheduler & sram
-int token_request_block (core* mycore, int gclk, int* in_spikes) {
+int token_request_block (core* mycore, int gclk, int* in_spikes, int coreno) {
 
     token* tkn = &(mycore->tkn);
     int tick = (gclk / GTICK_INTERVAL) % TICK_NUMBER;// why don't use gclk
@@ -56,8 +56,9 @@ int token_request_block (core* mycore, int gclk, int* in_spikes) {
     // processing start
     if (gclk % GTICK_INTERVAL == 0)
         *state = 0;
+        neuron_num = (*state)/2;
     // processing end, need new global synchronous clk tick
-    if (*state == 2 * NEURONS)
+    if (*state == 2 * (NEURONS-1) + 1)
         return 0;
     if (!tkn_checker) {
         tkn->token_activate++;
@@ -78,7 +79,7 @@ int token_request_block (core* mycore, int gclk, int* in_spikes) {
         //cinfo->input_idx = 0;
         memcpy ((void*)&(cinfo->ninfo), (void*)tkn->ninfo, sizeof(neuron_info));
         if (cinfo->ninfo.ntype == 0) {
-            memcpy ((void*)&(cinfo->spike), (void*)in_spikes, sizeof(PIXEL_NUMBER*4));
+            memcpy ((void*)&(cinfo->spike), (void*)in_spikes, PIXEL_NUMBER*sizeof(int));
             cinfo->input_idx = gclk;
         } else {
             memcpy ((void*)&(cinfo->spike), (void*)tkn->input, sizeof(axon));
@@ -95,7 +96,7 @@ int token_request_block (core* mycore, int gclk, int* in_spikes) {
 }
 
 // advancing comparing unit ('token compute unit') in TokenController
-int token_compute_block (core* mycore) {
+int token_compute_block (core* mycore, int coreno) {
 
     token* tkn = &(mycore->tkn);
     queue* rq = &(tkn->rq);
@@ -137,11 +138,11 @@ int token_compute_block (core* mycore) {
     return send_request_to_neuron (mycore, cinfo);
 }
 
-void token_advance (core* mycore, int gclk, int* in_spikes) {
+void token_advance (core* mycore, int gclk, int* in_spikes, int coreno) {
 
     tkn_checker = 0;
-    token_request_block (mycore, gclk, in_spikes);
-    token_compute_block (mycore);
+    token_request_block (mycore, gclk, in_spikes, coreno);
+    token_compute_block (mycore, coreno);
 
     return;
 }

@@ -2,7 +2,7 @@
 #include <pthread.h>
 #include "core.h"
 
-#define SIMTIME     20000
+#define SIMTIME     30000
 #define FILE_NAME   256
 
 chip mychip;
@@ -77,12 +77,13 @@ int main (int argc, char* argv[]) {
     }
 
     fclose(fp);
-
     // simulate TrueNorth for 'SIMTIME' tick
+    int* input;
+    int idx;
     printf ("simulate TrueNorth Chip for %dms...\n", SIMTIME/GTICK_INTERVAL);
     for (i = 0; i < SIMTIME; i++) {
-        int idx = i/GTICK_INTERVAL;
-        int* input = &in_spikes[idx][0];
+        idx = i/GTICK_INTERVAL;
+        input = &in_spikes[idx][0];
         printf ("global clock: %d\n", i);
         chip_advance (&mychip, i, input);
         if (i%GTICK_INTERVAL == 0) {
@@ -105,6 +106,45 @@ int main (int argc, char* argv[]) {
         }
     }
     printf ("complete!\n");
+
+    // write output trace
+    FILE* fp1;
+    FILE* fp2;
+    if ((fp1 = fopen("/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/trace.txt","w"))==NULL)
+    {
+        printf("Can not open the file..");
+        exit(0);
+    }
+
+    if ((fp2 = fopen("/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/output.txt","w"))==NULL)
+    {
+        printf("Can not open the file..");
+        exit(0);
+    }
+
+    core* mycore;
+    trace* trace_ptr;
+    output* output_ptr;
+    for (int k = 0; k < CHIP_LENGTH*CHIP_LENGTH; ++k) {
+        mycore = &(mychip.cores[k]);
+        // write trace
+        fprintf(fp1,"The trace of core %d: \n", k);
+        while(isempty(&(mycore->nrn.trq)) == 0) {
+           trace_ptr = (trace*) dequeue (&(mycore->nrn.trq));
+           fprintf(fp1,"%d  %d \n", trace_ptr->gclk, trace_ptr->dest);
+           free(trace_ptr);
+        }
+        // write output
+        fprintf(fp2,"The output of core %d: \n", k);
+        while(isempty(&(mycore->nrn.oq)) == 0) {
+            output_ptr = (output*) dequeue (&(mycore->nrn.oq));
+            fprintf(fp2,"%d  %d \n", output_ptr->input_idx, output_ptr->neuron_id);
+            free(output_ptr);
+        }
+    }
+
+    fclose(fp1);
+    fclose(fp2);
 
     // print out final simulation result
     simulation_report ();

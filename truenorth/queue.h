@@ -22,13 +22,14 @@ typedef struct node_ {
 typedef struct {
     node* head;
     node* tail;
-    int max_size;
+    int max_size; // infinite depth if max_size is 0
     int size;
 } queue;
 
 void queue_init (queue* myqueue, int size);
 int isempty (queue* myqueue);
 int enqueue (queue* myqueue, void* element);
+int append(queue* myqueue, void* element);
 void* dequeue (queue* myqueue);
 int queue_flush (queue* myqueue);
 
