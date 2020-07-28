@@ -129,6 +129,7 @@ int main (int argc, char* argv[]) {
         mycore = &(mychip.cores[k]);
         // write trace
         fprintf(fp1,"The trace of core %d: \n", k);
+        printf("Issue time  dest\n");
         while(isempty(&(mycore->nrn.trq)) == 0) {
            trace_ptr = (trace*) dequeue (&(mycore->nrn.trq));
            fprintf(fp1,"%d  %d \n", trace_ptr->gclk, trace_ptr->dest);
@@ -136,6 +137,7 @@ int main (int argc, char* argv[]) {
         }
         // write output
         fprintf(fp2,"The output of core %d: \n", k);
+        printf("input index  neuron id\n");
         while(isempty(&(mycore->nrn.oq)) == 0) {
             output_ptr = (output*) dequeue (&(mycore->nrn.oq));
             fprintf(fp2,"%d  %d \n", output_ptr->input_idx, output_ptr->neuron_id);

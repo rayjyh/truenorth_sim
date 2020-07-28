@@ -26,7 +26,9 @@ time.h
 queue.h
 /Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/queue.h
 
-/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/coresram.c
+/Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/main.c
+pthread.h
+-
 core.h
 /Users/jingyu/Desktop/neuromorphic_computing/sw:hw codesign/simulators/truenorth_sim/truenorth/core.h
 
